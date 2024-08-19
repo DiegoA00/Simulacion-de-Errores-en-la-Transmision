@@ -8,17 +8,21 @@ class OSIModelSimulator:
     def application_layer(self):
         header = f"Filename: file.txt\nSize: {len(self.file_content)} bytes\n"
         data = header + self.file_content
-        print("Application Layer: Data prepared with header.")
+        print("Capa de Aplicacion: Preparando los datos.")
         return data
 
     # Capa de Transporte
     def transport_layer(self, data, simulate_out_of_order=False):
         segment_size = 10  # tamaño de cada segmento
         segments = [data[i:i + segment_size] for i in range(0, len(data), segment_size)]
+        
+        # se les asigna un numero a los segmentos para poder ordenarlos luego
+        segments = [(i, segment) for i, segment in enumerate(segments)]
+
         if simulate_out_of_order:
             random.shuffle(segments)  # Simula el envío fuera de orden
-        segments = [(i, segment) for i, segment in enumerate(segments)]  # añade números de secuencia
-        print("Transport Layer: Data segmented and numbered.")
+        
+        print("Capa de Transporte: Segmentando los datos.")
         return segments
 
     # Capa de Red
@@ -27,7 +31,7 @@ class OSIModelSimulator:
         ip_dest = "192.168.1.2"
         packets = []
         for seq, segment in segments:
-            if simulate_packet_loss and random.random() < 0.1:
+            if simulate_packet_loss and random.random() < 0.01:
                 print(f"Network Layer: Packet {seq} lost during transmission.")
                 continue  # Simula la pérdida de paquetes
             packet = {
@@ -47,7 +51,7 @@ class OSIModelSimulator:
         frames = []
         for packet in packets:
             checksum = sum(ord(char) for char in packet['data']) % 256
-            if simulate_data_corruption and random.random() < 0.1:
+            if simulate_data_corruption and random.random() < 0.01:
                 packet['data'] = packet['data'][:5] + 'X' + packet['data'][6:]  # Corrompe los datos
                 print(f"Data Link Layer: Packet {packet['sequence']} corrupted.")
             frame = {
@@ -65,6 +69,18 @@ class OSIModelSimulator:
         signals = [frame for frame in frames]  # En una simulación real, esto convertiría los frames en señales eléctricas.
         print("Physical Layer: Data transmitted as signals.")
         return signals
+    
+    def transport_layer_receive(self, segments):
+        # Ordenar los segmentos por el número de secuencia
+        segments.sort(key=lambda x: x[0])
+        
+        # Reconstruir los datos
+        reconstructed_data = ''.join(segment for _, segment in segments)
+        return reconstructed_data
+
+    def application_layer_receive(self, data):
+            header, content = data.split('\n', 2)[1:]  # Elimina el encabezado
+            return content
 
     # Recepción de datos en el Servidor
     def receive_data(self, signals):
@@ -106,6 +122,8 @@ class OSIModelSimulator:
         print("Application Layer: Data received and reassembled.")
         return final_data
 
+    
+
     # Simulación completa
     def simulate(self):
         data = self.application_layer()
@@ -122,6 +140,6 @@ class OSIModelSimulator:
 
 
 # Uso de la clase
-file_content = "This is a test file content. We are testing the OSI model simulation."
-simulator = OSIModelSimulator(file_content)
-simulator.simulate()
+# file_content = "This is a test file content. We are testing the OSI model simulation."
+# simulator = OSIModelSimulator(file_content)
+# simulator.simulate()
