@@ -25,7 +25,9 @@ class NetworkLayer:
         return self.transport_pdu
     
     def simulate_packet_loss(self, loss_probability=0.1):
-        for pdu in self.transport_pdu:
+        for pdu in self.transport_pdu[:]:
             if random.random() < loss_probability:
+                self.transport_pdu.remove(pdu)  # Eliminar el PDU si se "pierde"
                 self.packets_lost += 1
+
         return self.packets_lost

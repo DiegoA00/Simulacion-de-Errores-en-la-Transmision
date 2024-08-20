@@ -16,11 +16,14 @@ class OSIModelSimulator:
         segment_size = 10  # tamaño de cada segmento
         segments = [data[i:i + segment_size] for i in range(0, len(data), segment_size)]
         
-        # se les asigna un numero a los segmentos para poder ordenarlos luego
-        segments = [(i, segment) for i, segment in enumerate(segments)]
-
         if simulate_out_of_order:
+            # se les asigna un numero a los segmentos para poder ordenarlos luego
+            segments = [(i, segment) for i, segment in enumerate(segments)]
             random.shuffle(segments)  # Simula el envío fuera de orden
+        else:
+            random.shuffle(segments)  # Simula el envío fuera de orden
+            # se les asigna un numero a los segmentos para poder ordenarlos luego
+            segments = [(i, segment) for i, segment in enumerate(segments)]
         
         print("Capa de Transporte: Segmentando los datos.")
         return segments
