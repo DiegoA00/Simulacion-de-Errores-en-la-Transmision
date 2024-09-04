@@ -1,0 +1,1 @@
+Errores de Envío Fuera de Orden: Se simuló el envío de datos fuera de orden, lo que causó que los segmentos del mensaje llegaran en orden incorrecto, complicando la reconstrucción del mensaje completo. 
